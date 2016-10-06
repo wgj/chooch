@@ -19,14 +19,14 @@ var hosts []host
 func readHosts() {
 	f, err := os.Open(filename)
 	if err != nil {
-		log.Println(err)
+		log.Fatal(err)
 	}
 	defer f.Close()
 
 	scanner := bufio.NewScanner(f)
 	for scanner.Scan() {
 		hosts = append(hosts, host{name: scanner.Text()})
-		// TODO: parse for urls, set host.protocol and host.endpoint
+		// TODO: parse for urls, set host.protocol and host.endpoint. net/url.Parse seems like a good fit.
 	}
 	if err := scanner.Err(); err != nil {
 		log.Printf("error reading hosts from %s:%s\n", filename, err)
@@ -48,4 +48,6 @@ func main() {
 	// TODO: host method for ICMP
 	// TODO: figure out how to represent responses.
 	// TODO: store responses in google sheets.
+	// TODO: cache writes to google sheets if network is unavailable.
+	// TODO: rewrite host request methods as goroutines.
 }
