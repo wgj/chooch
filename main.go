@@ -4,7 +4,12 @@ import (
 	"bufio"
 	"flag"
 	"log"
+	"net"
 	"os"
+	"runtime"
+
+	"golang.org/x/net/icmp"
+	"golang.org/x/net/ipv4"
 )
 
 type host struct {
@@ -39,6 +44,61 @@ func init() {
 	// Check for '-f' flag for host file
 	flag.StringVar(&filename, "f", "hosts", "File with hosts and urls to check.")
 	flag.Parse()
+}
+
+func (h host) ping() {
+	switch runtime.GOOS {
+	case "darwin":
+	case "linux":
+		log.Println("you may need to adjust the net.ipv4.ping_group_range kernel state")
+	default:
+		log.Println("not supported on", runtime.GOOS)
+		return
+	}
+
+	c, err := icmp.ListenPacket("udp4", "0.0.0.0")
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer c.Close()
+
+	wm := icmp.Message{
+		Type: ipv4.ICMPTypeEcho, Code: 0,
+		Body: &icmp.Echo{
+			ID: os.Getpid() & 0xffff, Seq: 1,
+			Data: []byte("Ranger-Chooch"),
+		},
+	}
+	wb, err := wm.Marshal(nil)
+	if err != nil {
+		log.Fatal(err)
+	}
+	/* TODO: move net.LookupHost() outside of ping.
+	 * Rewrite ping() to accept IP addresses, or make IP addresses a field in host{}.
+	 */
+	addrs, err := net.LookupHost(h.name)
+	if err != nil {
+		log.Fatal(err)
+	}
+	// Cowardly taking the first address.
+	if _, err := c.WriteTo(wb, &net.UDPAddr{IP: net.ParseIP(addrs[1])}); err != nil {
+		log.Println("break")
+		log.Fatal(err)
+	}
+
+	rb := make([]byte, 1500)
+	n, peer, err := c.ReadFrom(rb)
+	if err != nil {
+		log.Fatal(err)
+	}
+	rm, err := icmp.ParseMessage(1, rb[:n])
+	if err != nil {
+		log.Fatal(err)
+	}
+	log.Printf("got reflection from %v", peer)
+	log.Printf("got %+v", rm)
+	log.Printf("got %s", rm.Body)
+
 }
 
 func main() {
