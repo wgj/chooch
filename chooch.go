@@ -7,6 +7,7 @@ import (
 	"net"
 	"os"
 	"runtime"
+	"strings"
 
 	"golang.org/x/net/icmp"
 	"golang.org/x/net/ipv4"
@@ -16,6 +17,7 @@ type host struct {
 	name     string
 	protocol string
 	endpoint string
+	addrs    []string
 }
 
 var hosts []host
@@ -46,6 +48,21 @@ func init() {
 	flag.Parse()
 }
 
+func (h *host) htoi() error {
+	if len(h.addrs) == 0 {
+		addrs, err := net.LookupHost(h.name)
+		for _, i := range addrs {
+			// Skip if address is ipv6.
+			if strings.Contains(i, ":") {
+				continue
+			}
+			h.addrs = append(h.addrs, i)
+		}
+		return err
+	}
+	return nil
+}
+
 func (h host) ping() {
 	switch runtime.GOOS {
 	case "darwin":
@@ -73,16 +90,9 @@ func (h host) ping() {
 	if err != nil {
 		log.Fatal(err)
 	}
-	/* TODO: move net.LookupHost() outside of ping.
-	 * Rewrite ping() to accept IP addresses, or make IP addresses a field in host{}.
-	 */
-	addrs, err := net.LookupHost(h.name)
-	if err != nil {
-		log.Fatal(err)
-	}
+
 	// Cowardly taking the first address.
-	if _, err := c.WriteTo(wb, &net.UDPAddr{IP: net.ParseIP(addrs[1])}); err != nil {
-		log.Println("break")
+	if _, err := c.WriteTo(wb, &net.UDPAddr{IP: net.ParseIP(h.addrs[0])}); err != nil {
 		log.Fatal(err)
 	}
 
@@ -98,6 +108,8 @@ func (h host) ping() {
 	log.Printf("got reflection from %v", peer)
 	log.Printf("got %+v", rm)
 	log.Printf("got %s", rm.Body)
+	log.Printf("rm.Body type: %T", rm.Body)
+	log.Printf("os.Getpid(): %d", os.Getpid()&0xffff)
 
 }
 
