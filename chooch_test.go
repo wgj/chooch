@@ -22,10 +22,6 @@ func TestPing(t *testing.T) {
 	s := make([]string, 0)
 	addrs := append(s, "127.0.0.1")
 	host{name: "localhost", addrs: addrs}.ping()
-
-	//s := make([]string, 0)
-	//addrs := append(s, "127.0.0.1")
-	host{name: "localhost", addrs: addrs}.ping()
 }
 
 func TestHtoI(t *testing.T) {
