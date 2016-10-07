@@ -16,3 +16,7 @@ func TestReadHosts(t *testing.T) {
 
 	}
 }
+
+func TestPing(t *testing.T) {
+	hosts[1].ping()
+}
