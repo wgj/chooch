@@ -28,7 +28,6 @@ func TestReadHosts(t *testing.T) {
 }
 
 func TestPing(t *testing.T) {
-	// TODO: Improve this when ping() has output.
 	want := resp{
 		seq:  0,
 		code: 0,
