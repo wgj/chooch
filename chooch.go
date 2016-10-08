@@ -3,11 +3,13 @@ package main
 import (
 	"bufio"
 	"flag"
+	"fmt"
 	"log"
 	"net"
 	"os"
 	"runtime"
 	"strings"
+	"time"
 
 	"golang.org/x/net/icmp"
 	"golang.org/x/net/ipv4"
@@ -18,6 +20,19 @@ type host struct {
 	protocol string
 	endpoint string
 	addrs    []string
+	resps    []resp
+}
+
+type resp struct {
+	id   int
+	seq  int
+	code int
+	sent time.Time // TODO: Store as time.
+	recv time.Time // TODO: Store as time.
+	dur  time.Duration
+	to   string
+	from string
+	body string // TODO: Find a more optimal storage. Works well for ICMP, but not for GET.
 }
 
 var hosts []host
@@ -63,7 +78,7 @@ func (h *host) htoi() error {
 	return nil
 }
 
-func (h host) ping() {
+func (h *host) ping() {
 	switch runtime.GOOS {
 	case "darwin":
 	case "linux":
@@ -79,38 +94,99 @@ func (h host) ping() {
 	}
 	defer c.Close()
 
-	wm := icmp.Message{
-		Type: ipv4.ICMPTypeEcho, Code: 0,
-		Body: &icmp.Echo{
-			ID: os.Getpid() & 0xffff, Seq: 1,
-			Data: []byte("Ranger-Chooch"),
-		},
-	}
-	wb, err := wm.Marshal(nil)
-	if err != nil {
-		log.Fatal(err)
-	}
+	s := fmt.Sprintf("Ranger-Chooch-%s", h.name)
+	var to net.IP
+	var from string
+	var sent, recv time.Time
 
-	// Cowardly taking the first address.
-	if _, err := c.WriteTo(wb, &net.UDPAddr{IP: net.ParseIP(h.addrs[0])}); err != nil {
-		log.Fatal(err)
+	// TODO: icmp echo forever
+	for i := 0; i < 1; i++ {
+		wm := icmp.Message{
+			Type: ipv4.ICMPTypeEcho, Code: 0,
+			/* TODO: Use ID and Data as a sanity check for Echo Replies.
+			 * Using ID was from the example from golang.org, and /sbin/ping uses its PID as ICMP's ID.
+			 * Maybe there's a reason for this, and we should keep ID as our PID.
+			 */
+
+			Body: &icmp.Echo{
+				ID: os.Getpid() & 0xffff, Seq: i & 0xffff,
+				Data: []byte(s),
+			},
+		}
+		wb, err := wm.Marshal(nil)
+		if err != nil {
+			log.Fatal(err)
+		}
+
+		// Cowardly taking the first address.
+		to = net.ParseIP(h.addrs[0])
+
+		if _, err := c.WriteTo(wb, &net.UDPAddr{IP: to}); err != nil {
+			log.Fatal(err)
+		}
+		sent = time.Now()
 	}
 
 	rb := make([]byte, 1500)
-	n, peer, err := c.ReadFrom(rb)
-	if err != nil {
-		log.Fatal(err)
-	}
-	rm, err := icmp.ParseMessage(1, rb[:n])
-	if err != nil {
-		log.Fatal(err)
-	}
-	log.Printf("got reflection from %v", peer)
-	log.Printf("got %+v", rm)
-	log.Printf("got %s", rm.Body)
-	log.Printf("rm.Body type: %T", rm.Body)
-	log.Printf("os.Getpid(): %d", os.Getpid()&0xffff)
+	// TODO: icmp echoreply forever
+	for i := 0; i < 1; i++ {
+		n, peer, err := c.ReadFrom(rb)
+		if err != nil {
+			log.Fatal(err)
+		}
+		recv = time.Now()
+		rm, err := icmp.ParseMessage(1, rb[:n])
+		if err != nil {
+			log.Fatal(err)
+		}
 
+		// TODO: check that ip and h.addrs[0] are the same.
+		from, _, _ = net.SplitHostPort(peer.String())
+		if h.addrs[0] != from {
+			log.Printf("got echo reply from %s; want %s", from, to)
+		}
+
+		if rm.Type != ipv4.ICMPTypeEchoReply {
+			log.Printf("received something other than ping: %d", rm.Type)
+			continue
+		}
+		/* Helpful for inspecting rm.
+		log.Printf("rm type: %T", rm)
+		log.Printf("rm.Body type: %T", rm.Body)
+		log.Printf("rm.Type type: %T", rm.Type)
+		log.Println("")
+		log.Printf("rm value: %+v", rm)
+		log.Printf("rm.Body value: %+v", rm.Body)
+		log.Printf("rm.Type value: %v", rm.Type)
+		log.Println("")
+		*/
+		/* BUG: can't access rm.Body.Data
+		 * log.Printf("rm.Body value: %+v", icmp.Echo(rm.Body).Data)
+		 * Ideally, we'd unpack rm.Body.Data into host.resps
+		 */
+		body := string(rm.Body.(*icmp.Echo).Data)
+		seq := rm.Body.(*icmp.Echo).Seq
+		id := rm.Body.(*icmp.Echo).ID
+		dur := sent.Sub(recv)
+		h.addResp(id, seq, rm.Code, sent, recv, dur, to.String(), from, body)
+		time.Sleep(time.Second)
+
+	}
+}
+
+func (h *host) addResp(id, seq, code int, sent, recv time.Time, dur time.Duration, to, from, body string) {
+	r := resp{
+		id:   id,
+		seq:  seq,
+		code: code,
+		sent: sent,
+		recv: recv,
+		dur:  dur,
+		to:   to,
+		from: from,
+		body: body,
+	}
+	h.resps = append(h.resps, r)
 }
 
 func main() {
@@ -122,4 +198,5 @@ func main() {
 	// TODO: store responses in google sheets.
 	// TODO: cache writes to google sheets if network is unavailable.
 	// TODO: rewrite host request methods as goroutines.
+	// TODO: intercept control-c, stop pings, drain responses, exit.
 }
