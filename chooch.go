@@ -150,20 +150,6 @@ func (h *host) ping() {
 			log.Printf("received something other than ping: %d", rm.Type)
 			continue
 		}
-		/* Helpful for inspecting rm.
-		log.Printf("rm type: %T", rm)
-		log.Printf("rm.Body type: %T", rm.Body)
-		log.Printf("rm.Type type: %T", rm.Type)
-		log.Println("")
-		log.Printf("rm value: %+v", rm)
-		log.Printf("rm.Body value: %+v", rm.Body)
-		log.Printf("rm.Type value: %v", rm.Type)
-		log.Println("")
-		*/
-		/* BUG: can't access rm.Body.Data
-		 * log.Printf("rm.Body value: %+v", icmp.Echo(rm.Body).Data)
-		 * Ideally, we'd unpack rm.Body.Data into host.resps
-		 */
 		body := string(rm.Body.(*icmp.Echo).Data)
 		seq := rm.Body.(*icmp.Echo).Seq
 		id := rm.Body.(*icmp.Echo).ID
