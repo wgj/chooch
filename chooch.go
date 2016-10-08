@@ -27,8 +27,8 @@ type resp struct {
 	id   int
 	seq  int
 	code int
-	sent time.Time // TODO: Store as time.
-	recv time.Time // TODO: Store as time.
+	sent time.Time
+	recv time.Time
 	dur  time.Duration
 	to   string
 	from string
@@ -48,7 +48,6 @@ func readHosts() {
 	scanner := bufio.NewScanner(f)
 	for scanner.Scan() {
 		hosts = append(hosts, host{name: scanner.Text()})
-		// TODO: parse for urls, set host.protocol and host.endpoint. net/url.Parse seems like a good fit.
 	}
 	if err := scanner.Err(); err != nil {
 		log.Printf("error reading hosts from %s:%s\n", filename, err)
@@ -103,11 +102,9 @@ func (h *host) ping() {
 	for i := 0; i < 1; i++ {
 		wm := icmp.Message{
 			Type: ipv4.ICMPTypeEcho, Code: 0,
-			/* TODO: Use ID and Data as a sanity check for Echo Replies.
-			 * Using ID was from the example from golang.org, and /sbin/ping uses its PID as ICMP's ID.
+			/* Using ID was from the example from golang.org, and /sbin/ping uses its PID as ICMP's ID.
 			 * Maybe there's a reason for this, and we should keep ID as our PID.
 			 */
-
 			Body: &icmp.Echo{
 				ID: os.Getpid() & 0xffff, Seq: i & 0xffff,
 				Data: []byte(s),
@@ -140,17 +137,19 @@ func (h *host) ping() {
 			log.Fatal(err)
 		}
 
-		// TODO: check that ip and h.addrs[0] are the same.
 		from, _, _ = net.SplitHostPort(peer.String())
 		if h.addrs[0] != from {
 			log.Printf("got echo reply from %s; want %s", from, to)
 		}
-
 		if rm.Type != ipv4.ICMPTypeEchoReply {
 			log.Printf("received something other than ping: %d", rm.Type)
 			continue
 		}
+
 		body := string(rm.Body.(*icmp.Echo).Data)
+		if s != body {
+			log.Printf("got echo reply body %s; want %s", body, s)
+		}
 		seq := rm.Body.(*icmp.Echo).Seq
 		id := rm.Body.(*icmp.Echo).ID
 		dur := sent.Sub(recv)
@@ -178,9 +177,9 @@ func (h *host) addResp(id, seq, code int, sent, recv time.Time, dur time.Duratio
 func main() {
 	// if an entry is a url, send a GET request
 	// if an entry is a hostname, send an ICMP ping
+	// TODO: parse h.name{}'s for urls, set host.protocol and host.endpoint. net/url.Parse seems like a good fit.
 	// TODO: host method for GET
 	// TODO: host method for ICMP
-	// TODO: figure out how to represent responses.
 	// TODO: store responses in google sheets.
 	// TODO: cache writes to google sheets if network is unavailable.
 	// TODO: rewrite host request methods as goroutines.
