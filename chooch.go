@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"log"
 	"net"
+	"net/url"
 	"os"
 	"runtime"
 	"strings"
@@ -60,6 +61,26 @@ func init() {
 	// Check for '-f' flag for host file
 	flag.StringVar(&filename, "f", "hosts", "File with hosts and urls to check.")
 	flag.Parse()
+}
+
+// TODO: parse h.name{}'s for urls, set host.protocol and host.endpoint. net/url.Parse seems like a good fit.
+func (h *host) unpackUrls() error {
+	var isUrl bool
+	// loop over host name
+	for i := 0; i < len(h.name)-1; i++ {
+		if string(h.name[i]) == ":" {
+			isUrl = true
+			break
+		}
+	}
+	if isUrl {
+		url, err := url.Parse(h.name)
+		h.protocol = url.Scheme
+		h.endpoint = url.Path
+		h.name = url.Host
+		return err
+	}
+	return nil
 }
 
 func (h *host) htoi() error {
@@ -177,11 +198,16 @@ func (h *host) addResp(id, seq, code int, sent, recv time.Time, dur time.Duratio
 func main() {
 	// if an entry is a url, send a GET request
 	// if an entry is a hostname, send an ICMP ping
-	// TODO: parse h.name{}'s for urls, set host.protocol and host.endpoint. net/url.Parse seems like a good fit.
 	// TODO: host method for GET
 	// TODO: host method for ICMP
 	// TODO: store responses in google sheets.
 	// TODO: cache writes to google sheets if network is unavailable.
 	// TODO: rewrite host request methods as goroutines.
-	// TODO: intercept control-c, stop pings, drain responses, exit.
+	/* TODO: intercept control-c, stop pings, drain responses, exit.
+	c := make(chan os.Signal, 1)
+	signal.Notify(c, os.Interrupt)
+	// Block until a signal is received.
+	s := <-c
+	fmt.Println("Got signal:", s)
+	*/
 }
