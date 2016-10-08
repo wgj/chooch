@@ -66,7 +66,3 @@ func TestHtoI(t *testing.T) {
 		t.Errorf("h.addrs: got %s, want %s", got, want)
 	}
 }
-
-func TestAddResp(t *testing.T) {
-
-}
