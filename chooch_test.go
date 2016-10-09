@@ -67,9 +67,20 @@ func TestHtoI(t *testing.T) {
 }
 
 func TestUnpackUrls(t *testing.T) {
+	err := h.unpackUrls()
+	if err != nil {
+		t.Error(err)
+	}
+	if h.protocol != "" {
+		t.Errorf("h.protocol got %s, want \"\"", h.protocol)
+	}
+	if h.endpoint != "" {
+		t.Errorf("h.endpoint got %s, want \"\"", h.endpoint)
+	}
+
 	h.name = "http://localhost/path"
 	want := host{protocol: "http", name: "localhost", endpoint: "/path"}
-	err := h.unpackUrls()
+	err = h.unpackUrls()
 	if err != nil {
 		t.Error(err)
 	}
