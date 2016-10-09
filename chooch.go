@@ -38,7 +38,7 @@ type resp struct {
 
 var hosts []host
 
-// readHosts reads in hosts from a file and populates hosts []host.
+// readHosts reads in hosts from filename and populates hosts []host.
 func readHosts() {
 	f, err := os.Open(filename)
 	if err != nil {
