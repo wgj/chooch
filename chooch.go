@@ -199,7 +199,6 @@ func main() {
 	// if an entry is a url, send a GET request
 	// if an entry is a hostname, send an ICMP ping
 	// TODO: host method for GET
-	// TODO: host method for ICMP
 	// TODO: store responses in google sheets.
 	// TODO: cache writes to google sheets if network is unavailable.
 	// TODO: rewrite host request methods as goroutines.
