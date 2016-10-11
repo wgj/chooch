@@ -199,6 +199,7 @@ func main() {
 	// if an entry is a url, send a GET request
 	// if an entry is a hostname, send an ICMP ping
 	// TODO: host method for GET
+	// TODO: figure out how to flush h.resps.resp{}.
 	// TODO: store responses in google sheets.
 	// TODO: cache writes to google sheets if network is unavailable.
 	// TODO: rewrite host request methods as goroutines.
@@ -209,4 +210,7 @@ func main() {
 	s := <-c
 	fmt.Println("Got signal:", s)
 	*/
+	// TODO: Add license
+	// TODO: Add badges
+	// TODO: add directions to README.md
 }
