@@ -33,7 +33,7 @@ type resp struct {
 	dur  time.Duration
 	to   string
 	from string
-	body string // TODO: Find a more optimal storage. Works well for ICMP, but not for GET.
+	body string
 }
 
 var hosts []host
