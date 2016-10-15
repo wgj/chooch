@@ -1,5 +1,6 @@
 # chooch
-![Build Status](https://travis-ci.org/wgjohnson/chooch.svg?branch=master) [![Coverage Status](https://coveralls.io/repos/github/wgjohnson/chooch/badge.svg?branch=master)](https://coveralls.io/github/wgjohnson/chooch?branch=master) ![go report card](https://goreportcard.com/badge/github.com/wgjohnson/chooch)
+![Build Status](https://travis-ci.org/wgjohnson/chooch.svg?branch=master) [![Coverage Status](https://coveralls.io/repos/github/wgjohnson/chooch/badge.svg?branch=master)](https://coveralls.io/github/wgjohnson/chooch?branch=master) 
+[![Code Climate](https://codeclimate.com/github/wgjohnson/chooch/badges/gpa.svg)](https://codeclimate.com/github/wgjohnson/chooch) ![go report card](https://goreportcard.com/badge/github.com/wgjohnson/chooch)
 
 Ranger Chooch snitches on latency so you don't have to.
 
