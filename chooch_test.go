@@ -8,14 +8,13 @@ import (
 var h host
 
 var filetests = []string{
-	"http://localhost:6060/",
-	"localhost",
+	"google-public-dns-a.google.com",
 }
 
 func init() {
-	h = host{name: "localhost"}
+	h = host{name: "google-public-dns-a.google.com"}
 	s := make([]string, 0)
-	h.addrs = append(s, "127.0.0.1")
+	h.addrs = append(s, "8.8.8.8")
 }
 
 func TestReadHosts(t *testing.T) {
@@ -31,11 +30,12 @@ func TestPing(t *testing.T) {
 	want := resp{
 		seq:  0,
 		code: 0,
-		to:   "127.0.0.1",
-		from: "127.0.0.1",
+		to:   "8.8.8.8",
+		from: "8.8.8.8",
 		body: fmt.Sprintf("Ranger-Chooch-%s", h.name),
 	}
 	h.ping()
+	//log.Printf("h: %+v", h)
 	if h.resps[0].seq != want.seq {
 		t.Errorf("h.resps[0].seq got %d, want %d", h.resps[0].seq, want.seq)
 	}
@@ -54,8 +54,8 @@ func TestPing(t *testing.T) {
 }
 
 func TestHtoI(t *testing.T) {
-	h := host{name: "localhost"}
-	want := "127.0.0.1"
+	h := host{name: "google-public-dns-a.google.com"}
+	want := "8.8.8.8"
 	err := h.htoi()
 	if err != nil {
 		t.Fatal(err)
