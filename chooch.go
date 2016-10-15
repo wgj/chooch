@@ -65,15 +65,15 @@ func init() {
 
 // unpackURLs parses h.name{}'s for urls, and sets h.protocol h.endpoint.
 func (h *host) unpackUrls() error {
-	var isUrl bool
+	var isURL bool
 	// loop over host name
 	for i := 0; i < len(h.name)-1; i++ {
 		if string(h.name[i]) == ":" {
-			isUrl = true
+			isURL = true
 			break
 		}
 	}
-	if isUrl {
+	if isURL {
 		url, err := url.Parse(h.name)
 		h.protocol = url.Scheme
 		h.endpoint = url.Path
