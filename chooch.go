@@ -198,7 +198,4 @@ func (h *host) addResp(id, seq, code int, sent, recv time.Time, dur time.Duratio
 func main() {
 	// if an entry is a url, send a GET request
 	// if an entry is a hostname, send an ICMP ping
-	// TODO: Add license
-	// TODO: Add badges
-	// TODO: add directions to README.md
 }
