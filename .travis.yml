@@ -1,0 +1,8 @@
+language: go
+
+go:
+  - 1.7
+  
+install:
+  - go get golang.org/x/net/icmp
+  - go get golang.org/x/net/ipv4
