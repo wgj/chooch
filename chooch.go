@@ -198,7 +198,6 @@ func (h *host) addResp(id, seq, code int, sent, recv time.Time, dur time.Duratio
 func main() {
 	// if an entry is a url, send a GET request
 	// if an entry is a hostname, send an ICMP ping
-	// TODO: cache writes to google sheets if network is unavailable.
 	// TODO: rewrite host request methods as goroutines.
 	/* TODO: intercept control-c, stop pings, drain responses, exit.
 	c := make(chan os.Signal, 1)
