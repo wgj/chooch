@@ -1,11 +1,17 @@
 language: go
 
+sudo: required
+
 go:
   - 1.7
   
+before_install:
+  - go get github.com/mattn/goveralls
+  - sudo /sbin/sysctl -w net.ipv4.ping_group_range="0 2147483647"
+
 install:
   - go get golang.org/x/net/icmp
   - go get golang.org/x/net/ipv4
-  - sudo /sbin/sysctl -w net.ipv4.ping_group_range="0 2147483647"
   
-sudo: required
+script:
+  - goveralls -service=travis-ci
