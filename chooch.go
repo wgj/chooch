@@ -63,7 +63,7 @@ func init() {
 	flag.Parse()
 }
 
-// TODO: parse h.name{}'s for urls, set host.protocol and host.endpoint. net/url.Parse seems like a good fit.
+// unpackURLs parses h.name{}'s for urls, and sets h.protocol h.endpoint.
 func (h *host) unpackUrls() error {
 	var isUrl bool
 	// loop over host name
