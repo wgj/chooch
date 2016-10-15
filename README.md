@@ -1,5 +1,5 @@
 # chooch
-![go report card](https://goreportcard.com/badge/github.com/wgjohnson/chooch)
+![Build Status](https://travis-ci.org/wgjohnson/chooch.svg?branch=master) ![go report card](https://goreportcard.com/badge/github.com/wgjohnson/chooch)
 
 Ranger Chooch snitches on latency so you don't have to.
 
