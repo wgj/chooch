@@ -17,3 +17,22 @@ Running on Linux requires kernel edits to allow unprivileged ICMP requests. [1](
 ```bash
 sudo /sbin/sysctl -w net.ipv4.ping_group_range="0 2147483647"
 ```
+
+## Background
+`chooch` is the result of a conversation between a sysadmin and a data scientist about a spotty network in the middle of the desert.
+
+We share responsibility for IT operations at Burning Man, including network uptime, and we were having a hard time pin pointing on a particular failure case. 
+We had a lot of theories about the cause of the issue (unreliable physical media, network latency, application load), but didn't have enough evidence to support any of our claims.
+`chooch` is an attempt to solve this problem.
+Or more accurately, point us in the right direction. 
+`chooch` will give us enough information to know the _where_ and _when_ for detailed inspections. 
+Currently, we're dependent on a user's first hand accounts, which may not have enough detail ("it happened on Friday" or "it doesn't work").
+
+`chooch` was suggested for two reasons: 
+
+* We didn't want to introduce large networking monitoring tools designed for enterprises. 
+Our problem is complex, but not that complex.
+Introducing a behemoth monitoring suite would create more problems than it solves (installation, configuration, maintenance).
+* We wanted an excuse to program in [go](https://golang.org/). This was an interesting enough problem, and allowed us to grow beyond sandboxes like [Exercism.io](http://exercism.io/).
+In addition to an interesting problem space, writing our own project meant exploring the greater software development life cycle.
+Writing our own unit tests, and using [Travis CI](https://travis-ci.org/) lets us exploring professional programming practices.
