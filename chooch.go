@@ -163,7 +163,7 @@ func (h *host) ping() {
 			log.Printf("got echo reply from %s; want %s", from, to)
 		}
 		if rm.Type != ipv4.ICMPTypeEchoReply {
-			log.Printf("received something other than ping: %d", rm.Type)
+			log.Printf("received something other than ping: %v", rm.Type)
 			continue
 		}
 
