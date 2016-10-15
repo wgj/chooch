@@ -6,5 +6,6 @@ go:
 install:
   - go get golang.org/x/net/icmp
   - go get golang.org/x/net/ipv4
+  - sudo /sbin/sysctl -w net.ipv4.ping_group_range="0 2147483647"
   
 sudo: required
