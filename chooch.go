@@ -119,7 +119,7 @@ func (h *host) ping() {
 	var from string
 	var sent, recv time.Time
 
-	// TODO: icmp echo forever
+	// TODO: ping() should icmp echo forever
 	for i := 0; i < 1; i++ {
 		wm := icmp.Message{
 			Type: ipv4.ICMPTypeEcho, Code: 0,
@@ -146,7 +146,7 @@ func (h *host) ping() {
 	}
 
 	rb := make([]byte, 1500)
-	// TODO: icmp echoreply forever
+	// TODO: ping() should icmp echoreply forever
 	for i := 0; i < 1; i++ {
 		n, peer, err := c.ReadFrom(rb)
 		if err != nil {
