@@ -9,8 +9,10 @@ Ranger Chooch snitches on latency so you don't have to.
 ```bash
 chooch -f hosts
 ```
-where `hosts` is a list of hostnames to monitor latency.
- 
-If an entry in `hosts` is a hostname, `chooch` will send ICMP `Echo`. 
+Where `hosts` is a list of hostnames to monitor latency. If an entry in `hosts` is a hostname, `chooch` will send ICMP `Echo`.  If an entry is a URL, `chooch` will send an HTTP `GET`.
 
-If an entry is a URL, `chooch` will send an HTTP `GET`.
+## Configuration
+Running on Linux requires kernel edits to allow unprivileged ICMP requests. [1](https://godoc.org/golang.org/x/net/icmp#ListenPacket)[2](https://sturmflut.github.io/linux/ubuntu/2015/01/17/unprivileged-icmp-sockets-on-linux/)[3](http://man7.org/linux/man-pages/man7/icmp.7.html)
+```bash
+sudo /sbin/sysctl -w net.ipv4.ping_group_range="0 2147483647"
+```
